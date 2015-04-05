@@ -61,7 +61,10 @@ class Vector(list):
     def __sub__(self, a): return self.__op(a, lambda c,d: c-d)
     def __div__(self, a): return self.__op(a, lambda c,d: c/d)
     def __mul__(self, a):
-        if isMatrix(self) and isMatrix(a):
+        if isSimpleVector(self) and isSimpleVector(a):
+            if len(self) == len(a):
+                return self.__and__(a)
+        elif isMatrix(self) and isMatrix(a):
             d1 = (len(self), len(self[0]))
             d2 = (len(a), len(a[0]))
             if d1[0] != d2[1] and d1[1] != d2[0]:
@@ -76,9 +79,8 @@ class Vector(list):
                         e += self[i][k] * a[k][j]
                     res[i].append(e)
             return res
-        else:
-            print "Operation is not supported."
-            return None
+        print "Operation is not supported."
+        return None
 
     def __and__(self, a):
         try:

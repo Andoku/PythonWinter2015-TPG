@@ -16,11 +16,39 @@ def make_op(s):
         '|': lambda x,y: x|y,
     }[s]
 
+def isMatrix(x):
+    if type(x) is not Vector: return False
+    if len(x) < 1: return False
+    for s in x:
+        if not isSimpleVector(s): return False
+    d = len(x[0])
+    for s in x:
+        if len(s) != d: return False
+    return True
+
+def isSimpleVector(x):
+    if type(x) is not Vector: return False
+    for e in x:
+        if not isinstance(e, (int, long, float)): return False
+    return True
+
 class Vector(list):
     def __init__(self, *argp, **argn):
         list.__init__(self, *argp, **argn)
 
     def __str__(self):
+        if isSimpleVector(self):
+            return "|" + " ".join(str(c) for c in self) + "|"
+        elif isMatrix(self):
+            res, lens = "", []
+            for j in xrange(len(self[0])):
+                lens.append(0)
+                for i in xrange(len(self)):
+                    l = len(str(self[i][j])) 
+                    if l > lens[j]: lens[j] = l 
+            for s in self:
+                res += "|" + " ".join(" " * (lens[j] - len(str(s[j]))) + str(s[j]) for j in xrange(len(s))) + "|\n"
+            return res[0:-1]
         return "[" + " ".join(str(c) for c in self) + "]"
 
     def __op(self, a, op):
@@ -32,7 +60,25 @@ class Vector(list):
     def __add__(self, a): return self.__op(a, lambda c,d: c+d)
     def __sub__(self, a): return self.__op(a, lambda c,d: c-d)
     def __div__(self, a): return self.__op(a, lambda c,d: c/d)
-    def __mul__(self, a): return self.__op(a, lambda c,d: c*d)
+    def __mul__(self, a):
+        if isMatrix(self) and isMatrix(a):
+            d1 = (len(self), len(self[0]))
+            d2 = (len(a), len(a[0]))
+            if d1[0] != d2[1] and d1[1] != d2[0]:
+                print "Wrong dimensions for matrix multiplication."
+                return None
+            res = Vector()
+            for i in xrange(d1[0]):
+                res.append([])
+                for j in xrange(d1[1]):
+                    e = 0
+                    for k in xrange(d1[1]):
+                        e += self[i][k] * a[k][j]
+                    res[i].append(e)
+            return res
+        else:
+            print "Operation is not supported."
+            return None
 
     def __and__(self, a):
         try:

@@ -130,6 +130,9 @@ while not Stop:
     except EOFError:
         print
         break
+    except KeyboardInterrupt:
+        print
+        break
 
     try:
         res = calc(line)

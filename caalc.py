@@ -123,6 +123,21 @@ calc = Calc()
 Vars={}
 PS1='--> '
 
+def calculate(line):
+    try:
+        res = calc(line)
+    except tpg.Error as exc:
+        print >> sys.stderr, exc
+        res = None
+    if res != None:
+        print res
+
+if len(sys.argv) == 2:
+    f = open(sys.argv[1], 'r')
+    for line in f:
+        calculate(line)
+    sys.exit(0)
+    
 Stop=False
 while not Stop:
     try:
@@ -133,11 +148,4 @@ while not Stop:
     except KeyboardInterrupt:
         print
         break
-
-    try:
-        res = calc(line)
-    except tpg.Error as exc:
-        print >> sys.stderr, exc
-        res = None
-    if res != None:
-        print res
+    calculate(line) 

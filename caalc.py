@@ -79,7 +79,12 @@ PS1='--> '
 
 Stop=False
 while not Stop:
-    line = raw_input(PS1)
+    try:
+        line = raw_input(PS1)
+    except EOFError:
+        print
+        break
+
     try:
         res = calc(line)
     except tpg.Error as exc:
